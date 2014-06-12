@@ -39,6 +39,7 @@ class Board
           pos = [r_index, c_index]
           color = tile.color
           dupped_board.place_piece(color, pos)
+        end
       end
     end
     dupped_board
@@ -65,9 +66,11 @@ class Board
         end
         color = toggle_color(color)
       end
+      print " #{i}"
       color = toggle_color(color)
       puts
     end
+    puts "   0  1  2  3  4  5  6  7"
   end
   
   def toggle_color(color)

@@ -23,8 +23,10 @@ class Piece
         perform_jump(move)
       end
     else
-      perform_slide(move_arr.flatten)
+      move = move_arr.flatten
+      perform_slide(move) || perform_jump(move)
     end
+    maybe_promote
   end
   
   def perform_move(move_arr)
@@ -32,10 +34,13 @@ class Piece
     piece = dupped_board[@position]
     if move_arr.length > 1
       move_arr.each do |move|
-        raise InvalidMoveError unless piece.valid_jump?(move)
+        puts "Invalid move" unless piece.valid_jump?(move)
       end
     else
-      raise InvalidMoveError unless piece.valid_slide?(move_arr.flatten)
+      move = move_arr.flatten
+      unless piece.valid_slide?(move) || piece.valid_jump?(move)
+        puts "Invalid move"
+      end
     end
     perform_move!(move_arr)
   end
@@ -103,15 +108,12 @@ class Piece
   end
   
   def render
+    color = @color == :red ? :red : :light_white
     if @promoted
-      return " \u2654 "
+      return " \u2654 ".colorize(:color => color, :background => :black)
     else
       symbol = " \u25CE " # " \u25CE " " \u274D "
-      return symbol.colorize(:color => @color, :background => :black)
+      return symbol.colorize(:color => color, :background => :black)
+    end
   end
 end
-
-
-
-
-
