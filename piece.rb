@@ -17,24 +17,33 @@ class Piece
     end
   end
   
+  # TA: should raise errors if invalid move sequence.
   def perform_move!(move_arr)
+    # TA: we should be throwing an error if any move in the seq fails.
     if move_arr.length > 1
       move_arr.each do |move|
         perform_jump(move)
       end
     else
-      move = move_arr.flatten
+      move = move_arr[0]#.flatten
+      # TA: perform_slide will raise error if this is a valid jump.
       perform_slide(move) || perform_jump(move)
     end
-    maybe_promote
   end
+  
+  # TA:
+  # 1. perform_moves!
+  # 2. valid_move_sequence? Should catch any errors, and return false if needed.
+  # 3. perform_move => valid_move_sequence? and then maybe perform_moves!
   
   def perform_move(move_arr)
     dupped_board = @board.dup
     piece = dupped_board[@position]
+    new_start = @position
     if move_arr.length > 1
       move_arr.each do |move|
         puts "Invalid move" unless piece.valid_jump?(move)
+        perform_jump(move)
       end
     else
       move = move_arr.flatten
@@ -45,11 +54,18 @@ class Piece
     perform_move!(move_arr)
   end
   
+  def valid_move_sequence?moves_arr)
+    perform_move(moves_arr)
+  end
+  
+  # TA:
+  # These methods should raise errors if it's invalid.
   def perform_slide(target)
     if valid_slide?(target)
       @board[@position] = nil
       @position = target
       @board[target] = self
+      maybe_promote
     end
   end
   
@@ -59,6 +75,7 @@ class Piece
       @board[jumped_tile(target)] = nil
       @position = target
       @board[target] = self
+      maybe_promote
     end
   end
   
@@ -72,6 +89,7 @@ class Piece
       move_deltas.each do |delta|
         x = @position.first + delta.first
         y = @position.last + delta.last
+        # TA: extract Board#on_board? method.
         moves << [x, y] if (0...8).include?(x) && (0...8).include?(y)
       end
     end

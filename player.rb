@@ -4,7 +4,7 @@ class HumanPlayer
   end
   
   def get_piece
-    puts "Move which piece to where? (ex. 02)"
+    puts "Move which piece? (ex. 02)"
     gets.chomp.split('').map(&:to_i)
   end
   

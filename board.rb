@@ -14,7 +14,7 @@ class Board
     (5..7).each do |row|
       (0..7).each do |col|
         if row.even? == col.even?
-          board.place_piece(:blk, [row, col])
+          board.place_piece(:black, [row, col])
         end
       end 
     end
@@ -36,6 +36,7 @@ class Board
     @grid.each_with_index do |row, r_index|
       row.each_with_index do |tile, c_index|
         unless tile.nil?
+          # TA: what if the piece is already a king?
           pos = [r_index, c_index]
           color = tile.color
           dupped_board.place_piece(color, pos)
