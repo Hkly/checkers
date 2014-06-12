@@ -7,10 +7,6 @@ class Piece
     @promoted = false
   end
   
-  def inspect
-    return color.to_s
-  end
-  
   def move_deltas
     if @promoted
       return [[1, 1], [1 - 1], [-1, 1], [-1, -1]]
@@ -21,14 +17,43 @@ class Piece
     end
   end
   
+  def perform_move!(move_arr)
+    if move_arr.length > 1
+      move_arr.each do |move|
+        perform_jump(move)
+      end
+    else
+      perform_slide(move_arr.flatten)
+    end
+  end
+  
+  def perform_move(move_arr)
+    dupped_board = @board.dup
+    piece = dupped_board[@position]
+    if move_arr.length > 1
+      move_arr.each do |move|
+        raise "Invalid move." unless piece.valid_jump?(move)
+      end
+    else
+      raise "Invalid move." unless piece.valid_slide?(move_arr.flatten)
+    end
+    perform_move!(move_arr)
+  end
+  
   def perform_slide(target)
-    @position = target if valid_slide?(target)
+    if valid_slide?(target)
+      @board[@position] = nil
+      @position = target
+      @board[target] = self
+    end
   end
   
   def perform_jump(target)
     if valid_jump?(target)
-      @position = target 
-      # remove jumped over piece
+      @board[@position] = nil
+      @board[jumped_tile(target)] = nil
+      @position = target
+      @board[target] = self
     end
   end
   
@@ -48,20 +73,19 @@ class Piece
   end
   
   def possible_jumps
-    paths = []
+    jumps = []
     move_deltas.each do |delta|
-      path = []
-      (1..2).each do |n|
-        x = @position.first + (delta.first * n)
-        y = @position.last + (delta.last * n)
-        path << [x, y] if (0...8).include?(x) && (0...8).include?(y)
-      end
-      paths << path
+        x = @position.first + (delta.first * 2)
+        y = @position.last + (delta.last * 2)
+        jumps << [x, y] if (0...8).include?(x) && (0...8).include?(y)
     end
-    paths = paths.select do |path| 
-      path.length == 2 && @board.capturable?(path.first, @color)
-    end
-    paths.map {|path| path.last}
+    jumps
+  end
+  
+  def jumped_tile(target)
+    jumped_x = (@position.first + target.first) / 2
+    jumped_y = (@position.last + target.last) / 2
+    [jumped_x, jumped_y]
   end
   
   def valid_slide?(target)
@@ -69,7 +93,21 @@ class Piece
   end
   
   def valid_jump?(target)
-    possible_jumps.include?(target) && @board[target].nil? 
+    if possible_jumps.include?(target)
+      @board.capturable?(jumped_tile(target), @color) && @board[target].nil?
+    end
+  end
+  
+  def inspect
+    return @color.to_s
+  end
+  
+  def render
+    if @promoted
+      return " \u2654 "
+    else
+      symbol = " \u25CE " # " \u25CE " " \u274D "
+      return symbol.colorize(:color => @color, :background => :black)
   end
 end
 
