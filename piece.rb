@@ -32,10 +32,10 @@ class Piece
     piece = dupped_board[@position]
     if move_arr.length > 1
       move_arr.each do |move|
-        raise "Invalid move." unless piece.valid_jump?(move)
+        raise InvalidMoveError unless piece.valid_jump?(move)
       end
     else
-      raise "Invalid move." unless piece.valid_slide?(move_arr.flatten)
+      raise InvalidMoveError unless piece.valid_slide?(move_arr.flatten)
     end
     perform_move!(move_arr)
   end

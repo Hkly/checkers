@@ -10,16 +10,23 @@ class Game
   
   def initialize
     @board = Board.make_starting_board
-    # @player1 = 
-    # @player2 = 
+    @player1 = HumanPlayer.new(:red)
+    @player2 = HumanPlayer.new(:black)
   end
   
   def play
-    
-    
+    until won?
+      
+    end
   end
   
   def won?
-    
+    !winner.nil?
+  end
+  
+  def winner
+    flat_board = @board.grid.flatten.compact
+    return :red if flat_board.all? {|t| t.color == :red }
+    return :black if flat_board.all? {|t| t.color == :black }
   end
 end
