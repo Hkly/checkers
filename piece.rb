@@ -17,17 +17,36 @@ class Piece
     end
   end
   
+  def perform_move(moves_arr)
+    raise InvalidMoveError unless valid_move_sequence?(moves_arr)
+    perform_move!(moves_arr)
+  end
+  
+  def valid_move_sequence?(moves_arr)
+    dupped_board = @board.dup
+    piece = dupped_board[@position]    
+    begin
+      piece.perform_move!(moves_arr)
+      return true
+    rescue
+      return false
+    end
+  end
+  
   # TA: should raise errors if invalid move sequence.
-  def perform_move!(move_arr)
+  def perform_move!(moves_arr)
     # TA: we should be throwing an error if any move in the seq fails.
-    if move_arr.length > 1
-      move_arr.each do |move|
+    if moves_arr.length > 1
+      moves_arr.each do |move|
         perform_jump(move)
       end
     else
-      move = move_arr[0]#.flatten
-      # TA: perform_slide will raise error if this is a valid jump.
-      perform_slide(move) || perform_jump(move)
+      move = moves_arr[0]
+      if possible_slides.include?(move)
+        perform_slide(move) 
+      else
+        perform_jump(move)
+      end
     end
   end
   
@@ -35,28 +54,7 @@ class Piece
   # 1. perform_moves!
   # 2. valid_move_sequence? Should catch any errors, and return false if needed.
   # 3. perform_move => valid_move_sequence? and then maybe perform_moves!
-  
-  def perform_move(move_arr)
-    dupped_board = @board.dup
-    piece = dupped_board[@position]
-    new_start = @position
-    if move_arr.length > 1
-      move_arr.each do |move|
-        puts "Invalid move" unless piece.valid_jump?(move)
-        perform_jump(move)
-      end
-    else
-      move = move_arr.flatten
-      unless piece.valid_slide?(move) || piece.valid_jump?(move)
-        puts "Invalid move"
-      end
-    end
-    perform_move!(move_arr)
-  end
-  
-  def valid_move_sequence?moves_arr)
-    perform_move(moves_arr)
-  end
+
   
   # TA:
   # These methods should raise errors if it's invalid.
@@ -66,6 +64,8 @@ class Piece
       @position = target
       @board[target] = self
       maybe_promote
+    else
+      raise InvalidMoveError
     end
   end
   
@@ -76,6 +76,8 @@ class Piece
       @position = target
       @board[target] = self
       maybe_promote
+    else
+      raise InvalidMoveError
     end
   end
   

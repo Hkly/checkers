@@ -14,11 +14,10 @@ class Board
     (5..7).each do |row|
       (0..7).each do |col|
         if row.even? == col.even?
-          board.place_piece(:black, [row, col])
+          board.place_piece(:white, [row, col])
         end
       end 
     end
-    
     board
   end
   

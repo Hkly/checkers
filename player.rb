@@ -1,4 +1,6 @@
 class HumanPlayer
+  attr_reader :color
+  
   def initialize(color)
     @color = color
   end
@@ -11,7 +13,8 @@ class HumanPlayer
   def get_target
     moves =[]
     puts "Move to where? (Enter path as: 51, 33, 15, etc.)"
-    gets.chomp.split(',').each do |num_pair|
+    input_arr = gets.chomp.split(',')
+    input_arr.each do |num_pair|
       moves << num_pair.split('').map(&:to_i)
     end
     moves
